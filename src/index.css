@@ -1,0 +1,20 @@
+@import "tailwindcss";
+.links {
+  color: #000;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.links:hover {
+  color: #0ac6ae;
+  transform: scale(1);
+}
+.underline {
+  text-decoration: none;
+}
+.logo-carry {
+  color: black;
+}
+.links:nth-child(1) {
+  color: #0ac6ae;
+}
