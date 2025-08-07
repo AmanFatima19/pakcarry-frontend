@@ -8,6 +8,8 @@ function Login() {
   const navigate = useNavigate();
   const [isRegister, setIsRegister] = useState(true);
   const [backendError, setBackendError] = useState("");
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
 
   const [formData, setFormData] = useState({
     name: "",
@@ -29,21 +31,23 @@ function Login() {
     setErrors({});
     setBackendError("");
 
-    
     const newErrors = {};
-    if (isRegister) {
-      // if (!formData.name.trim()) newErrors.name = "Full name is required";
-       if (!formData.name.trim()) {
-      newErrors.name = "Full name is required";
-    } else if (formData.name.trim().length < 4) {
-      newErrors.name = "Fullname must be at least 4 characters long";
-    }
-    }
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    if (!formData.password.trim()) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.trim().length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
+    if (!isForgotPassword) {
+      if (isRegister) {
+        if (!formData.name.trim()) {
+          newErrors.name = "Full name is required";
+        } else if (formData.name.trim().length < 4) {
+          newErrors.name = "Fullname must be at least 4 characters long";
+        }
+      }
+      if (!formData.email.trim()) newErrors.email = "Email is required";
+      if (!formData.password.trim()) {
+        newErrors.password = "Password is required";
+      } else if (formData.password.trim().length < 8) {
+        newErrors.password = "Password must be at least 8 characters long";
+      }
+    } else {
+      if (!formData.email.trim()) newErrors.email = "Email is required";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -52,14 +56,25 @@ function Login() {
     }
 
     try {
-      if (isRegister) {
-        const response = await axios.post("http://localhost:3000/register", formData);
-        console.log(response.data)
+      if (isForgotPassword) {
+        const response = await axios.post(
+          "http://localhost:8000/forgot-password",
+          { email: formData.email }
+        );
+        toast.success(response.data.msg);
+        setFormData({ ...formData, email: "" });
+        setIsForgotPassword(false);
+      } else if (isRegister) {
+        const response = await axios.post(
+          "http://localhost:8000/register",
+          formData
+        );
+        console.log(response.data);
         toast.success("Registered successfully! Please login.");
         setIsRegister(false);
         setFormData({ name: "", email: "", password: "", role: "user" });
       } else {
-        const response = await axios.post("http://localhost:3000/login", {
+        const response = await axios.post("http://localhost:8000/login", {
           email: formData.email,
           password: formData.password,
         });
@@ -69,10 +84,10 @@ function Login() {
 
         const userRole = response.data.user.role;
         if (userRole === "admin") {
-          navigate('/admin-dashboard');
+          navigate("/admin-dashboard");
         } else {
-          toast.success('User Logged In Successfully');
-          navigate('/user-dashboard');
+          toast.success("User Logged In Successfully");
+          navigate("/user-dashboard");
         }
       }
     } catch (error) {
@@ -95,30 +110,54 @@ function Login() {
       <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-10 min-h-screen">
         <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-3xl font-bold text-center">
-            {isRegister ? "Sign Up" : "Login"}
+            {isForgotPassword
+              ? "Forgot Password"
+              : isRegister
+              ? "Sign Up"
+              : "Login"}
           </h2>
 
-          <div className="flex justify-center mb-4 mt-6">
-            <button
-              className={`w-1/2 px-4 py-2 border rounded-l-md ${
-                isRegister ? "bg-[#0ac6ae] text-white font-semibold" : "bg-white"
-              }`}
-              onClick={() => setIsRegister(true)}
-            >
-              Register
-            </button>
-            <button
-              className={`w-1/2 px-4 py-2 border rounded-r-md ${
-                !isRegister ? "bg-[#0ac6ae] text-white font-semibold" : "bg-white"
-              }`}
-              onClick={() => setIsRegister(false)}
-            >
-              Login
-            </button>
-          </div>
+          {!isForgotPassword && (
+            <div className="flex justify-center mb-4 mt-6">
+              <button
+                className={`w-1/2 px-4 py-2 border rounded-l-md ${
+                  isRegister
+                    ? "bg-[#0ac6ae] text-white font-semibold"
+                    : "bg-white"
+                }`}
+                onClick={() => setIsRegister(true)}
+              >
+                Register
+              </button>
+              <button
+                className={`w-1/2 px-4 py-2 border rounded-r-md ${
+                  !isRegister
+                    ? "bg-[#0ac6ae] text-white font-semibold"
+                    : "bg-white"
+                }`}
+                onClick={() => setIsRegister(false)}
+              >
+                Login
+              </button>
+            </div>
+          )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {isRegister ? (
+            {isForgotPassword ? (
+              <>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter your email"
+                  className="w-full border px-4 py-2 mb-1 mt-4 rounded focus:outline-[#0ac6ae]"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-sm">{errors.email}</p>
+                )}
+              </>
+            ) : isRegister ? (
               <>
                 <input
                   type="text"
@@ -128,7 +167,9 @@ function Login() {
                   placeholder="Full Name"
                   className="w-full border px-4 py-2 mb-1 mt-3 rounded focus:outline-[#0ac6ae]"
                 />
-                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                {errors.name && (
+                  <p className="text-red-500 text-sm">{errors.name}</p>
+                )}
                 <div className="my-2"></div>
                 <input
                   type="email"
@@ -138,18 +179,33 @@ function Login() {
                   placeholder="Email"
                   className="w-full border px-4 py-2 mb-1 rounded focus:outline-[#0ac6ae]"
                 />
-                {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+                {errors.email && (
+                  <p className="text-red-500 text-sm">{errors.email}</p>
+                )}
                 <div className="my-2"></div>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                  className="w-full border px-4 py-2 mb-1 rounded focus:outline-[#0ac6ae]"
-                />
-                {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-                   <div className="my-2"></div>
+                <div className="relative">
+                  {" "}
+                  {/* Added relative positioning */}
+                  <input
+                    type={showPassword ? "text" : "password"} // Dynamic type
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    className="w-full border px-4 py-2 mb-1 rounded focus:outline-[#0ac6ae]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                  >
+                    {showPassword ? "Hide" : "Show"} {/* Toggle button text */}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-red-500 text-sm">{errors.password}</p>
+                )}
+                <div className="my-2"></div>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center text-sm cursor-pointer">
                     <input
@@ -185,17 +241,32 @@ function Login() {
                   placeholder="Email"
                   className="w-full border px-4 py-2 mb-1 mt-4 rounded focus:outline-[#0ac6ae]"
                 />
-                {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
- <div className="my-2"></div>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                  className="w-full border px-4 py-2 mb-1 rounded focus:outline-[#0ac6ae]"
-                />
-                {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+                {errors.email && (
+                  <p className="text-red-500 text-sm">{errors.email}</p>
+                )}
+                <div className="my-2"></div>
+                <div className="relative">
+                  {" "}
+                  {/* Added relative positioning */}
+                  <input
+                    type={showPassword ? "text" : "password"} // Dynamic type
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    className="w-full border px-4 py-2 mb-1 rounded focus:outline-[#0ac6ae]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                  >
+                    {showPassword ? "Hide" : "Show"} {/* Toggle button text */}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-red-500 text-sm">{errors.password}</p>
+                )}
               </>
             )}
 
@@ -207,10 +278,26 @@ function Login() {
               type="submit"
               className="w-full bg-[#0ac6ae] hover:bg-[#089f8d] transition duration-300 text-white py-2 rounded mt-2"
             >
-              {isRegister ? "Sign Up" : "Login"}
+              {isForgotPassword
+                ? "Send Reset Email"
+                : isRegister
+                ? "Sign Up"
+                : "Login"}
             </button>
 
-            {isRegister ? (
+            {isForgotPassword ? (
+              <p className="text-sm mt-2 text-center">
+                <span
+                  className="text-[#0ac6ae] cursor-pointer"
+                  onClick={() => {
+                    setIsForgotPassword(false);
+                    setIsRegister(false);
+                  }}
+                >
+                  Back to Login
+                </span>
+              </p>
+            ) : isRegister ? (
               <p className="text-sm mt-2 text-center">
                 Already have an account?{" "}
                 <span
@@ -223,7 +310,10 @@ function Login() {
             ) : (
               <>
                 <p className="text-sm mt-2 text-center">
-                  <span className="text-[#0ac6ae] cursor-pointer">
+                  <span
+                    className="text-[#0ac6ae] cursor-pointer"
+                    onClick={() => setIsForgotPassword(true)}
+                  >
                     Forgot Password?
                   </span>
                 </p>

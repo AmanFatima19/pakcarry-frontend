@@ -19,34 +19,45 @@ import UserOrders from "./pages/UserOrders";
 import UserTrips from "./pages/UserTrips";
 import NewSendOrder from "./pages/NewSendOrder";
 import TripPage from "./pages/TripPage";
+import ResetPassword from "./pages/ResetPassword";
 
 function AppContent() {
   const location = useLocation();
 
-  const hiddenRoutes = ["/login","/admin-dashboard","/user-dashboard","/user-orders","/user-trips","/new-trip","/new-send-order"];
+  const hiddenRoutes = [
+    "/login",
+    "/admin-dashboard",
+    "/user-dashboard",
+    "/user-orders",
+    "/user-trips",
+    "/new-trip",
+    "/new-send-order",
+  ];
   const shouldShowNavs = !hiddenRoutes.includes(location.pathname);
-  const shouldShowFooter = !hiddenRoutes.includes(location.pathname); 
+  const shouldShowFooter = !hiddenRoutes.includes(location.pathname);
 
   return (
     <>
       {shouldShowNavs && <Navbar />}
 
       <Routes>
-         <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/feedback" element={<Feedback />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/admin-dashboard" element={<Admin />} />
-          <Route path="/user-dashboard" element={<UserDashboard />} />
-          <Route path="/user-orders" element={<UserOrders />} />
-          <Route path="/user-trips" element={<UserTrips />} />
-          <Route path="/new-trip" element={<TripPage />} />
-          <Route path="/new-send-order" element={<NewSendOrder />} />
-
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/feedback" element={<Feedback />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/reset-password/:resetPasswordToken"
+          element={<ResetPassword />}
+        />
+        <Route path="/admin-dashboard" element={<Admin />} />
+        <Route path="/user-dashboard" element={<UserDashboard />} />
+        <Route path="/user-orders" element={<UserOrders />} />
+        <Route path="/user-trips" element={<UserTrips />} />
+        <Route path="/new-trip" element={<TripPage />} />
+        <Route path="/new-send-order" element={<NewSendOrder />} />
       </Routes>
-            {shouldShowFooter && <Footer />} 
-
+      {shouldShowFooter && <Footer />}
     </>
   );
 }
