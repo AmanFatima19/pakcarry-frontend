@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   useLocation,
+  Navigate, // Import Navigate
 } from "react-router-dom";
 import "./index.css";
 import Navbar from "./components/common/Navbar";
@@ -20,6 +21,22 @@ import UserTrips from "./pages/UserTrips";
 import NewSendOrder from "./pages/NewSendOrder";
 import TripPage from "./pages/TripPage";
 import ResetPassword from "./pages/ResetPassword";
+
+// Naya ProtectedRoute Component
+const ProtectedRoute = ({ children, roleRequired }) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
+
+  if (!token || !user) {
+    return <Navigate to="/login" />;
+  }
+
+  if (roleRequired && user.role !== roleRequired) {
+    return <Navigate to="/user-dashboard" />;
+  }
+
+  return children;
+};
 
 function AppContent() {
   const location = useLocation();
@@ -50,7 +67,18 @@ function AppContent() {
           path="/reset-password/:resetPasswordToken"
           element={<ResetPassword />}
         />
-        <Route path="/admin-dashboard" element={<Admin />} />
+
+        {/* Admin Dashboard Protected Route */}
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute roleRequired="admin">
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* User Dashboard Protected Routes */}
         <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/user-orders" element={<UserOrders />} />
         <Route path="/user-trips" element={<UserTrips />} />

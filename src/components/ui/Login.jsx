@@ -6,24 +6,19 @@ import toast from "react-hot-toast";
 function Login() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const [isRegister, setIsRegister] = useState(true);
+  const [isRegister, setIsRegister] = useState(false); // Default to login
   const [backendError, setBackendError] = useState("");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "user",
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleRoleChange = (e) => {
-    setFormData({ ...formData, role: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -56,25 +51,23 @@ function Login() {
     }
 
     try {
+      let response;
       if (isForgotPassword) {
-        const response = await axios.post(
-          "http://localhost:8000/forgot-password",
-          { email: formData.email }
-        );
+        response = await axios.post("http://localhost:8000/forgot-password", {
+          email: formData.email,
+        });
         toast.success(response.data.msg);
         setFormData({ ...formData, email: "" });
         setIsForgotPassword(false);
       } else if (isRegister) {
-        const response = await axios.post(
-          "http://localhost:8000/register",
-          formData
-        );
+        response = await axios.post("http://localhost:8000/register", formData);
         console.log(response.data);
         toast.success("Registered successfully! Please login.");
         setIsRegister(false);
-        setFormData({ name: "", email: "", password: "", role: "user" });
+        setFormData({ name: "", email: "", password: "" });
       } else {
-        const response = await axios.post("http://localhost:8000/login", {
+        // Updated logic for login
+        response = await axios.post("http://localhost:8000/login", {
           email: formData.email,
           password: formData.password,
         });
@@ -184,10 +177,8 @@ function Login() {
                 )}
                 <div className="my-2"></div>
                 <div className="relative">
-                  {" "}
-                  {/* Added relative positioning */}
                   <input
-                    type={showPassword ? "text" : "password"} // Dynamic type
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
@@ -199,37 +190,12 @@ function Login() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                   >
-                    {showPassword ? "Hide" : "Show"} {/* Toggle button text */}
+                    {showPassword ? "Hide" : "Show"}
                   </button>
                 </div>
                 {errors.password && (
                   <p className="text-red-500 text-sm">{errors.password}</p>
                 )}
-                <div className="my-2"></div>
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center text-sm cursor-pointer">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="user"
-                      checked={formData.role === "user"}
-                      onChange={handleRoleChange}
-                      className="mr-1"
-                    />
-                    User
-                  </label>
-                  <label className="flex items-center text-sm cursor-pointer">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="admin"
-                      checked={formData.role === "admin"}
-                      onChange={handleRoleChange}
-                      className="mr-1"
-                    />
-                    Admin
-                  </label>
-                </div>
               </>
             ) : (
               <>
@@ -246,10 +212,8 @@ function Login() {
                 )}
                 <div className="my-2"></div>
                 <div className="relative">
-                  {" "}
-                  {/* Added relative positioning */}
                   <input
-                    type={showPassword ? "text" : "password"} // Dynamic type
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
@@ -261,7 +225,7 @@ function Login() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                   >
-                    {showPassword ? "Hide" : "Show"} {/* Toggle button text */}
+                    {showPassword ? "Hide" : "Show"}
                   </button>
                 </div>
                 {errors.password && (

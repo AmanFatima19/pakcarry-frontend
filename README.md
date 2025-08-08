@@ -1,46 +1,12 @@
-README.md
-Project Overview
-This is a full-stack application built for a P2P package delivery platform. The project includes a robust backend with user authentication (signup, login, forgot/reset password) and a basic frontend to handle user interactions. It uses a modern tech stack to ensure the application is secure, scalable, and easy to maintain.
+# React + Vite
 
-Key Features
-User Authentication: Secure user registration and login using bcrypt for password hashing and JSON Web Tokens (JWT) for session management.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Forgot/Reset Password: Users can reset their passwords via email using a secure token, implemented with nodemailer.
+Currently, two official plugins are available:
 
-Email Notifications: The application sends welcome emails on registration and login alerts to notify users of successful sign-ins.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-Role-Based Access: Supports different user roles (e.g., user and admin) to manage access to different parts of the application.
+## Expanding the ESLint configuration
 
-Login/Register UI: A responsive frontend component (Login.jsx) for user signup and login.
-
-Show/Hide Password: An added feature to toggle password visibility for better user experience.
-
-Technologies Used
-Backend
-Node.js: JavaScript runtime environment.
-
-Express.js: Web application framework for building RESTful APIs.
-
-MongoDB: NoSQL database for data storage.
-
-Mongoose: ODM (Object Data Modeling) library for MongoDB.
-
-Bcrypt.js: Library for hashing passwords.
-
-jsonwebtoken (JWT): For creating secure access tokens.
-
-Nodemailer: For sending emails (login alerts, password reset links).
-
-Dotenv: To manage environment variables.
-
-Frontend
-React: JavaScript library for building the user interface.
-
-React Router DOM: For handling routing and navigation.
-
-Axios: Promise-based HTTP client for making API requests.
-
-Tailwind CSS: A utility-first CSS framework for styling.
-
-React Hot Toast: For displaying notifications and alerts.
-
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
